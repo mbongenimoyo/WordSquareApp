@@ -9,7 +9,7 @@ import java.util.List;
 class WordSquareSolverTest {
 
 
-    static DictionaryLoader loader = new DictionaryLoader();;
+    static DictionaryLoader loader = new DictionaryLoader();
 
     @BeforeAll
     public static void beforeTests(){
@@ -49,7 +49,7 @@ class WordSquareSolverTest {
     }
 
     @Test
-    public void givenBaseCase2_thenReturnListOfFIveWords() {
+    public void givenBaseCase2_thenReturnListOfFiveWords() {
         WordSquareSolver resolver = new WordSquareSolver(loader);
 
         Assertions.assertEquals(List.of("feast","earth","armor","stone","threw"), resolver.solveWordSquare(5, "aaaeeeefhhmoonssrrrrttttw"));

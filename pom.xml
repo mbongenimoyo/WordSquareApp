@@ -20,12 +20,6 @@
             <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.0.0-jre</version> <!-- or latest stable -->
-        </dependency>
-
     </dependencies>
 
 </project>

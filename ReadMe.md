@@ -129,7 +129,6 @@ mvn test
 
 ## 📦 Dependencies
 - [JUnit Jupiter 5.8.1](https://junit.org/junit5/) (testing)
-- [Google Guava 33.0.0-jre](https://github.com/google/guava) (utilities)
 
 ## 💡 Notes & Tips
 - All main logic is under `src/main/java/org/moyo/`.

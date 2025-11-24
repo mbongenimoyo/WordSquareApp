@@ -50,7 +50,7 @@ public class WordSquareApp {
         return arguments;
     }
 
-    static void validateRequiredArguments(Map<String, String> arguments) {
+    private static void validateRequiredArguments(Map<String, String> arguments) {
         if (!arguments.containsKey("size") || !arguments.containsKey("sequence")) {
             System.err.println("Usage: java Main -size <size> -sequence <letters> [-dictionaryFilePath <path>]");
             System.err.println("Example: java Main -size 5 -sequence aabbeeeeeeeehmosrrrruttvv");
@@ -59,7 +59,7 @@ public class WordSquareApp {
         }
     }
 
-    static int getSize(Map<String, String> arguments) {
+    private static int getSize(Map<String, String> arguments) {
         int size = 0;
         try {
             size = Integer.parseInt(arguments.get("size"));
