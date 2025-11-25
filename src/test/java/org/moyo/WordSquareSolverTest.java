@@ -36,15 +36,19 @@ class WordSquareSolverTest {
     @Test
     public void giveGridSizeOfZero_whenSolveWordSquare_thenReturnEmptyList() {
 
+        //given
         WordSquareSolver resolver = new WordSquareSolver(loader);
 
+        //when & then
         Assertions.assertEquals(List.of(), resolver.solveWordSquare(0, "sdsasdfas"));
     }
 
     @Test
     public void givenBaseCase1_whenSolveWordSquare_thenReturnListOfFourWords() {
+        //given
         WordSquareSolver resolver = new WordSquareSolver(loader);
 
+        //
         Assertions.assertEquals(List.of("moan","once","acme","need"), resolver.solveWordSquare(4, "aaccdeeeemmnnnoo"));
     }
 
