@@ -62,7 +62,7 @@ The default dictionary is based on [enable1.txt](http://norvig.com/ngrams/enable
   - `WordSquareApp`: Handles CLI and argument parsing.
   - `DictionaryLoader`: Loads and manages the dictionary.
   - `WordSquareSolver`: Contains the core solving algorithm.
-  - `DefaultWordSquareBuilder`: Supports construction of word squares.
+  - `WordSquareBuilder`: Supports construction of word squares.
 - **No 2D Arrays:** The implementation avoids 2D arrays, favoring more maintainable data structures.
 - **APIs & Libraries:** Uses Java standard libraries and Google Guava for utility functions.
 - **TDD:** The project includes unit tests for all major components (see `src/test`).
