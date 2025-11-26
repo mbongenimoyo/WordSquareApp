@@ -3,46 +3,166 @@ package org.moyo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class WordSquareApp {
     private static final String DEFAULT_DICTIONARY_PATH = "src/main/resources/words.txt";
+    private DictionaryLoader loader;
+    private WordSquareSolver resolver;
+    private boolean running = true;
+
+    public WordSquareApp(String dictionaryPath) {
+        System.out.println("Loading dictionary from: " + dictionaryPath);
+        this.loader = new DictionaryLoader();
+        this.loader.loadFromTextFile(dictionaryPath);
+        this.resolver = new WordSquareSolver(loader);
+        System.out.println("Dictionary loaded. Ready to solve word squares.");
+    }
 
     public static void main(String[] args) {
-        Map<String, String> arguments = parseArguments(args);
+        // Parse initial dictionary path if provided
+        Map<String, String> initialArgs = parseArguments(args);
+        String dictionaryPath = initialArgs.getOrDefault("dictionaryFilePath", DEFAULT_DICTIONARY_PATH);
 
-        validateRequiredArguments(arguments);
+        WordSquareApp app = new WordSquareApp(dictionaryPath);
+        app.run();
+    }
 
-        int size = getSize(arguments);
-        String sequence = arguments.get("sequence");
-        String dictionaryPath = arguments.getOrDefault("dictionaryFilePath", DEFAULT_DICTIONARY_PATH);
+    private void run() {
+        Scanner scanner = new Scanner(System.in);
 
-        DictionaryLoader loader = new DictionaryLoader();
-        loader.loadFromTextFile(dictionaryPath);
+        printHelp();
 
-        WordSquareSolver resolver = new WordSquareSolver(loader);
+        while (running) {
+            System.out.print("\n> ");
+            String input = scanner.nextLine().trim();
 
-        List<String> results = resolver.solveWordSquare(size, sequence);
+            if (input.isEmpty()) {
+                continue;
+            }
 
-        if (results.isEmpty()) {
-            System.out.println("No solutions found.");
-        } else {
-            results.forEach(System.out::println);
+            processCommand(input);
+        }
+
+        scanner.close();
+        System.out.println("Exiting Word Square Solver. Goodbye!");
+    }
+
+    private void processCommand(String input) {
+        String[] tokens = input.split("\\s+");
+        String command = tokens[0].toLowerCase();
+
+        switch (command) {
+            case "solve":
+                handleSolve(tokens);
+                break;
+            case "load":
+                handleLoad(tokens);
+                break;
+            case "help":
+                printHelp();
+                break;
+            case "exit":
+            case "quit":
+                running = false;
+                break;
+            default:
+                System.err.println("Unknown command: " + command);
+                System.out.println("Type 'help' for available commands.");
         }
     }
 
+    private void handleSolve(String[] tokens) {
+        try {
+            // Convert tokens to args format
+            String[] args = new String[tokens.length - 1];
+            System.arraycopy(tokens, 1, args, 0, tokens.length - 1);
+
+            Map<String, String> arguments = parseArguments(args);
+
+            if (!arguments.containsKey("size") || !arguments.containsKey("sequence")) {
+                System.err.println("Error: Missing required arguments.");
+                System.out.println("Usage: solve -size <size> -sequence <letters>");
+                System.out.println("Example: solve -size 5 -sequence aabbeeeeeeeehmosrrrruttvv");
+                return;
+            }
+
+            int size = getSize(arguments);
+            String sequence = arguments.get("sequence");
+
+            System.out.println("Solving word square of size " + size + " with sequence: " + sequence);
+            long startTime = System.currentTimeMillis();
+
+            List<String> results = resolver.solveWordSquare(size, sequence);
+
+            long endTime = System.currentTimeMillis();
+
+            if (results.isEmpty()) {
+                System.out.println("No solutions found.");
+            } else {
+                System.out.println("\nFound " + results.size() + " solution(s):\n");
+                results.forEach(System.out::println);
+            }
+            System.out.println("\n...done in " + (endTime - startTime) + "ms");
+
+        } catch (Exception e) {
+            System.err.println("Error solving word square: " + e.getMessage());
+        }
+    }
+
+    private void handleLoad(String[] tokens) {
+        if (tokens.length < 2) {
+            System.err.println("Error: Missing dictionary path.");
+            System.out.println("Usage: load <path>");
+            System.out.println("Example: load ./custom-dictionary.txt");
+            return;
+        }
+
+        String path = tokens[1];
+        try {
+            System.out.println("Loading dictionary from: " + path);
+            this.loader = new DictionaryLoader();
+            this.loader.loadFromTextFile(path);
+            this.resolver = new WordSquareSolver(loader);
+            System.out.println("Dictionary loaded successfully.");
+        } catch (Exception e) {
+            System.err.println("Error loading dictionary: " + e.getMessage());
+        }
+    }
+
+    private void printHelp() {
+        System.out.print("""
+            
+            === Word Square Solver ===
+            Available commands:
+              solve -size <size> -sequence <letters>
+                  Solve a word square with the given size and letter sequence
+                  Example: solve -size 5 -sequence aabbeeeeeeeehmosrrrruttvv
+            
+              load <path>
+                  Load a different dictionary file
+                  Example: load ./custom-dictionary.txt
+            
+              help
+                  Display this help message
+            
+              exit | quit
+                  Exit the application
+            
+            """);
+    }
     static Map<String, String> parseArguments(String[] args) {
         Map<String, String> arguments = new HashMap<>();
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("-")) {
-                String key = args[i].substring(1); // Remove the '-' prefix
+                String key = args[i].substring(1);
 
                 if (i + 1 < args.length && !args[i + 1].startsWith("-")) {
                     arguments.put(key, args[i + 1]);
-                    i++; // Skip the next argument since we've used it as a value
+                    i++;
                 } else {
                     System.err.println("Error: Argument " + args[i] + " requires a value");
-                    System.exit(1);
                 }
             }
         }
@@ -50,26 +170,15 @@ public class WordSquareApp {
         return arguments;
     }
 
-    private static void validateRequiredArguments(Map<String, String> arguments) {
-        if (!arguments.containsKey("size") || !arguments.containsKey("sequence")) {
-            System.err.println("Usage: java Main -size <size> -sequence <letters> [-dictionaryFilePath <path>]");
-            System.err.println("Example: java Main -size 5 -sequence aabbeeeeeeeehmosrrrruttvv");
-            System.err.println("Example: java Main -size 5 -sequence aabbeeeeeeeehmosrrrruttvv -dictionaryFilePath ./custom-dictionary.txt");
-            System.exit(1);
-        }
-    }
-
     private static int getSize(Map<String, String> arguments) {
         int size = 0;
         try {
             size = Integer.parseInt(arguments.get("size"));
             if (size < 2) {
-                System.err.println("Error: Size must be at least 2");
-                System.exit(1);
+                throw new IllegalArgumentException("Size must be at least 2");
             }
         } catch (NumberFormatException e) {
-            System.err.println("Error: Size must be a valid integer");
-            System.exit(1);
+            throw new IllegalArgumentException("Size must be a valid integer");
         }
         return size;
     }

@@ -54,9 +54,10 @@ public class WordSquareBuilder {
             Map<Character, Integer> updatedLetters = consumeLetters(candidateWord, remainingLetters);
 
             if (buildSquare(currentSquare, updatedLetters)) {
+                System.out.println("Found solution: " + currentSquare);
                 return true;
             }
-
+            System.out.println("Backtracking...");
             currentSquare.remove(currentSquare.size() - 1);
         }
 
